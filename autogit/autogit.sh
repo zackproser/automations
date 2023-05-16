@@ -1,20 +1,19 @@
 #!/bin/bash
 
-AUTOGIT_LAST_PROCESSED_REPO="${AUTOGIT_LAST_PROCESSED_REPO:-""}"
-
 # Initialize the previous directory
 prev_dir=""
 
 # Function to determine if the current working directory is a git repository
-is_git_repository() {
+function is_git_repository() {
   git -C . rev-parse 2> /dev/null
 }
-
-get_repo_root() {
+# Determine the root directory of the current git repository - used to determine if the user 
+# has changed into a sub-directory of the repo (meaning that we shouldn't re-run auto_pull)
+function get_repo_root() {
   git rev-parse --show-toplevel 2> /dev/null
 }
 
-changed_to_subdir() {
+function changed_to_subdir() {
   local repo_root
   repo_root=$(get_repo_root)
   if [[ -z "$repo_root" ]]; then 
@@ -23,12 +22,12 @@ changed_to_subdir() {
   fi
   local cwd
   cwd=$(realpath .)
-  [[ "$cwd" != "$repo_root" && "$cwd"/ != "repo_root/"* ]]
+  [[ "$cwd" != "$repo_root" && "$repo_root"/ != "repo_root/"* ]]
 }
 
 # Handle the edge case where a local repository was originally cloned when the GitHub remote's default branch was "master" but has since become out of date
 # And we need to update the local repository to use the new GitHub default branch, which is probably named "main"
-check_and_switch_to_main() {
+function check_and_switch_to_main() {
   if git show-ref --verify --quiet refs/heads/master && \
      git show-ref --verify --quiet refs/remotes/origin/main && \
      ! git show-ref --verify --quiet refs/remotes/origin/master; then
@@ -40,15 +39,15 @@ check_and_switch_to_main() {
   return 1  # return false
 }
 
-# Function to determine the default branch
-get_default_branch() {
+# Determine the default branch from the perspective of GitHub 
+function get_default_branch() {
     local default_branch
     default_branch=$(git remote show origin | grep "HEAD branch" | cut -d ":" -f 2 | xargs)
     echo "$default_branch"
 }
 
-# Function to check if a branch switch has occurred on the remote
-check_branch_switch() {
+# Checks if a branch switch has occurred on the remote
+function check_branch_switch() {
     local default_branch
     default_branch=$(get_default_branch)
     git checkout "$default_branch" 2> /dev/null
