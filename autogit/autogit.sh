@@ -8,7 +8,7 @@ function is_git_repository() {
   git -C . rev-parse 2> /dev/null
 }
 # Determine the root directory of the current git repository - used to determine if the user 
-# has changed into a sub-directory of the repo (meaning that we shouldn't re-run auto_pull)
+# has changed into a sub-directory of the repo (meaning that we shouldn't re-run autogit)
 function get_repo_root() {
   git rev-parse --show-toplevel 2> /dev/null
 }
@@ -66,11 +66,10 @@ needs_pull() {
     ! git diff --quiet HEAD origin/"$default_branch" 2> /dev/null
 }
 
-auto_pull() {
+autogit() {
   if is_git_repository; then
 
-    # If the user navigates to a sub-directory of the original git repo, then we should not
-    # run auto_pull again
+    # If the user navigates to a sub-directory of the original git repo, then we should not run autogit again
     if changed_to_subdir; then
       return
     fi
@@ -110,25 +109,35 @@ auto_pull() {
     fi
 
     # Check if the repository needs to be updated
-    if ! needs_pull $default_branch; then
+    if ! needs_pull "$default_branch"; then
       echo "The repository is already up to date."
       return
     fi
 
     # Check if there are any changes
-    local stashName="auto_pull_$(date +%s)"
+    local stashName="autogit_$(date +%s)"
     if ! git diff-index --quiet HEAD --; then
       git stash save -u $stashName > /dev/null 2>&1
       if git stash list | grep -q $stashName; then
         echo "Local changes detected and stashed."
+        # Store the current branch as dirty (with stashed changes)
+        dirty_branch=$(git branch --show-current)
       fi
     fi
 
-    git checkout $original_branch > /dev/null 2>&1
+    # Checkout default branch and pull latest
+    git checkout "$default_branch"
+    git pull origin "$default_branch"
 
-    if git stash list | grep -q $stashName; then
-      echo "Applying stashed changes..."
-      git stash apply
+    # Checkout previous dirty branch and unstash changes
+    if [[ -n "$dirty_branch" ]]; then
+      git checkout "$dirty_branch"
+      if git stash list | grep -q "$stashName"; then
+        echo "Applying stashed changes..."
+        git stash apply
+      fi
+      # Reset dirty_branch variable
+      dirty_branch=""
     fi
   fi
 }
@@ -138,7 +147,7 @@ run_autogit() {
  current_dir=$(pwd)
  if [ "$prev_dir" != "$current_dir" ]; then 
    prev_dir="$current_dir"; 
-   auto_pull
+   autogit
  fi
 }
 
