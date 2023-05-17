@@ -116,8 +116,8 @@ auto_pull() {
     fi
 
     # Check if there are any changes
+    local stashName="auto_pull_$(date +%s)"
     if ! git diff-index --quiet HEAD --; then
-      local stashName="auto_pull_$(date +%s)"
       git stash save -u $stashName > /dev/null 2>&1
       if git stash list | grep -q $stashName; then
         echo "Local changes detected and stashed."
