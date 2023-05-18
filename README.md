@@ -4,6 +4,12 @@ Automations are shell scripts I wrote alongside generative AI, that leverage gen
 
 ![Shell automations for productivity and fun](./docs/automations-logo.png)
 
+## Installation & Usage
+
+**Under construction** - This section will updated with more information and shell-specifc instructions shortly.
+
+For now, see the nascent [usage guide](./docs/usage.md)
+
 ## Current automations
 
 ### `autogit`
