@@ -30,6 +30,8 @@ Here's an example of a code review you'd get back, right in your terminal, so th
 
 Never write "check in latest" ever again. Always get accurate, well-formed git messages that actually record the context of the changes you're making for posterity
 
+![auto git commit message writer](./docs/autocommitmessage.gif)
+
 ## How it works 
 
 Automations are shell scripts that wrap the excellent charm.sh libraries: 
