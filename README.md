@@ -20,5 +20,8 @@ autogit's goal is to ensure you're always working with the latest code, because 
 
 `autoreview` is a shell script that performs a detailed code review of your stashed git changes. 
 
-Coming soon - demo gif
+![Shell automation for automatic local code review](./docs/autoreview.gif)
 
+Here's an example of a code review you'd get back, right in your terminal, so that you can refer to the review while you fix your code in another buffer:
+
+![Example autoreview review output](./docs/autoreview-example.png)
