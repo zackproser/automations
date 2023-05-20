@@ -7,63 +7,58 @@ prev_dir=""
 function is_git_repository() {
   git -C . rev-parse 2> /dev/null
 }
-# Determine the root directory of the current git repository - used to determine if the user 
-# has changed into a sub-directory of the repo (meaning that we shouldn't re-run autogit)
+
+# Function to check for uncommitted changes
+function has_uncommitted_changes() {
+  git diff-index --quiet HEAD --
+  if [ $? -ne 0 ]; then
+    return 0  # has uncommitted changes
+  fi
+  return 1  # no uncommitted changes
+}
+
+# Prompt the user before stashing changes
+function prompt_stash_changes() {
+  read -p "You have uncommitted changes. Do you want to stash them? [y/N] " answer
+  if [[ "$answer" =~ ^[Yy]$ ]]; then
+    return 1  # stash changes
+  fi
+  return 0  # do not stash changes
+}
+
+# Determine the root directory of the current git repository
 function get_repo_root() {
   git rev-parse --show-toplevel 2> /dev/null
 }
 
+# Function to check if the user has changed to a subdirectory of the repo
 function changed_to_subdir() {
   local repo_root
   repo_root=$(get_repo_root)
-  if [[ -z "$repo_root" ]]; then 
-    # not a git repository 
+  if [[ -z "$repo_root" ]]; then
+    # not a git repository
     return 1
   fi
   local cwd
   cwd=$(realpath .)
-  [[ "$cwd" != "$repo_root" && "$repo_root"/ != "repo_root/"* ]]
+  [[ "$cwd"/ != "$repo_root"/ && "$cwd"/ != "$repo_root/"* ]]
 }
 
-# Handle the edge case where a local repository was originally cloned when the GitHub remote's default branch was "master" but has since become out of date
-# And we need to update the local repository to use the new GitHub default branch, which is probably named "main"
-function check_and_switch_to_main() {
-  if git show-ref --verify --quiet refs/heads/master && \
-     git show-ref --verify --quiet refs/remotes/origin/main && \
-     ! git show-ref --verify --quiet refs/remotes/origin/master; then
-    echo "The local repository was cloned when the remote repository had a default branch of 'master', but the remote repository's default branch has been switched to 'main'. Switching to 'main' and pulling..."
-    git checkout main
-    git pull origin main
-    return 0  # return true
-  fi
-  return 1  # return false
-}
-
-# Determine the default branch from the perspective of GitHub 
-function get_default_branch() {
-    local default_branch
-    default_branch=$(git remote show origin | grep "HEAD branch" | cut -d ":" -f 2 | xargs)
-    echo "$default_branch"
-}
-
-# Checks if a branch switch has occurred on the remote
+# Handle the case where the local repository's default branch has changed
 function check_branch_switch() {
-    local default_branch
-    default_branch=$(get_default_branch)
-    git checkout "$default_branch" 2> /dev/null
-    git fetch origin "$default_branch" 2> /dev/null
-    if git rev-parse --verify origin/"$default_branch" >/dev/null 2>&1; then
-        git checkout "$default_branch" && git pull origin "$default_branch"
-    fi
+  local default_branch
+  default_branch=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
+
+  git fetch origin "$default_branch"
+  git checkout "$default_branch" && git pull origin "$default_branch"
+
 }
 
-# Function to check if a git pull is needed
-needs_pull() {
-    local default_branch
-    default_branch=$(get_default_branch)
-
-    git fetch origin "$default_branch" > /dev/null 2>&1
-    ! git diff --quiet HEAD origin/"$default_branch" 2> /dev/null
+# Check if the repository needs to be updated
+function needs_pull() {
+  git fetch --all --prune
+  ! git diff --quiet HEAD "origin/$(git symbolic-ref --short HEAD)" 2> /dev/null && return 0  # needs to be updated
+  return 1  # up to date
 }
 
 autogit() {
@@ -86,69 +81,65 @@ autogit() {
       return
     fi
 
-    # Fetch all branches and tags, and prune deleted ones
-    echo "Fetching all branches and tags, and pruning deleted ones..."
-    git fetch --all --prune
-
-    # Check if the repository was cloned when the default branch was 'master' but now it's 'main'
-    if check_and_switch_to_main; then
-      return
-    fi
-
-    # Determine the default branch
-    local default_branch=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
-    if [[ -z "$default_branch" ]]; then
-      if git show-ref --verify --quiet refs/remotes/origin/main; then
-        default_branch="main"
-      elif git show-ref --verify --quiet refs/remotes/origin/master; then
-        default_branch="master"
-      else
-        echo "Could not determine default branch"
-        return
-      fi
-    fi
-
     # Check if the repository needs to be updated
-    if ! needs_pull "$default_branch"; then
+    if ! needs_pull; then
       echo "The repository is already up to date."
       return
     fi
 
-    # Check if there are any changes
-    local stashName="autogit_$(date +%s)"
-    if ! git diff-index --quiet HEAD --; then
-      git stash save -u $stashName > /dev/null 2>&1
-      if git stash list | grep -q $stashName; then
-        echo "Local changes detected and stashed."
-        # Store the current branch as dirty (with stashed changes)
-        dirty_branch=$(git branch --show-current)
+    # Check for uncommitted changes
+    if has_uncommitted_changes; then
+      if prompt_stash_changes; then
+        # User chose not to stash changes, abort
+        echo "Aborting: uncommitted changes detected."
+        return
+      fi
+      # Store the current branch as dirty (with stashed changes)
+      dirty_branch=$(git branch --show-current)
+      git stash save -u "autogit_$(date +%s)" > /dev/null 2>&1
+      if git stash list | grep -q "autogit_"; then
+        echo "Local changes stashed."
       fi
     fi
 
-    # Checkout default branch and pull latest
-    git checkout "$default_branch"
-    git pull origin "$default_branch"
+    # Save the current branch
+    current_branch=$(git branch --show-current)
 
-    # Checkout previous dirty branch and unstash changes
+    # Check if the local repository's default branch has changed
+    check_branch_switch
+
+    # Pull changes to the default branch
+    git checkout "$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')"
+    git pull
+
+    # Reset to the saved branch
+    git checkout "$current_branch"
+
+    # Unstash changes if necessary
     if [[ -n "$dirty_branch" ]]; then
-      git checkout "$dirty_branch"
-      if git stash list | grep -q "$stashName"; then
-        echo "Applying stashed changes..."
-        git stash apply
+      if git stash list | grep -q "autogit_"; then
+        git stash apply "$(git stash list | grep "autogit_" | awk '{print $1}')"
+        echo "Stashed changes applied to $dirty_branch."
       fi
       # Reset dirty_branch variable
       dirty_branch=""
     fi
+
+    # Notify the user of successful completion
+    echo "Autogit has successfully updated the repository."
   fi
 }
 
 run_autogit() {
- local current_dir; 
- current_dir=$(pwd)
- if [ "$prev_dir" != "$current_dir" ]; then 
-   prev_dir="$current_dir"; 
-   autogit
- fi
+  local current_dir
+  current_dir=$(pwd)
+  for subdir in $(find "$current_dir" -type d -name .git); do
+    cd "$(dirname "$subdir")"  # change to the repository directory
+    if [ "$prev_dir" != "$(pwd)" ]; then
+      prev_dir="$(pwd)"
+      autogit
+    fi
+  done
 }
 
 run_autogit
