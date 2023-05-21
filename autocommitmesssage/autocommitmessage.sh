@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# Initialize the previous directory
-prev_dir=""
-
-# Function to check dependencies
 check_dependencies() {
     local DEPS=("mods" "gum")
     local MISSING_DEPS=()

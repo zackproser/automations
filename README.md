@@ -2,13 +2,19 @@
 
 Automations are shell scripts I wrote alongside generative AI, that leverage generative AI to make common developer tasks delightful and efficient. 
 
-![Shell automations for productivity and fun](./docs/automations-logo.png)
+![Shell automations for productivity and fun](./docs/automations.gif)
 
 ## Installation & Usage
 
-**Under construction** - This section will updated with more information and shell-specifc instructions shortly.
+### Prerequisites
 
-For now, see the nascent [usage guide](./docs/usage.md)
+* [mods](https://github.com/charmbracelet/mods)
+* [glow](https://github.com/charmbracelet/glow) 
+* [gum](https://github.com/charmbracelet/gum) 
+
+### Usage
+
+[Usage guide](./docs/usage.md)
 
 ## Current automations
 

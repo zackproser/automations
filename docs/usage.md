@@ -17,3 +17,14 @@ function cd() {
   builtin cd "$@" && gum spin --title "Autogit updating git repo if necessary..." --show-output ~/bin/autogit.sh
 }
 ```
+## Integrating autocommitmessage with your shell
+
+# Create a new shell function named whatever you like 
+
+I picked `gcai`, because my git commit alias is already `gc` - so `gcai` stands for `git commit A.I.`
+
+```
+function gcai() {
+  autocommitmessage 
+}
+```
