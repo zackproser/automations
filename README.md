@@ -16,7 +16,7 @@ For now, see the nascent [usage guide](./docs/usage.md)
 
 autogit's goal is to ensure you're always working with the latest code, because even experienced developers forget to `git pull` at the least opportune times.
 
-![autogit is a shell script that handles git fetching, branch pruning and more](./docs/autogit-master-main.gif)
+![autogit is a shell script that handles git fetching, branch pruning and more](./docs/autogit.gif)
 
 [**Read the deep-dive blog post on `autogit`** to learn about everything it can do.](https://www.zackproser.com/blog/autogit-introduction)
 
