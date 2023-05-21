@@ -3,6 +3,30 @@
 # Initialize the previous directory
 prev_dir=""
 
+# Function to check dependencies
+check_dependencies() {
+    local DEPS=("mods")
+    local MISSING_DEPS=()
+
+    for dep in "${DEPS[@]}"; do
+        if ! command -v $dep &> /dev/null; then
+            MISSING_DEPS+=($dep)
+        fi
+    done
+
+    if [ ${#MISSING_DEPS[@]} -ne 0 ]; then
+        echo "The following dependencies are missing:"
+        for dep in "${MISSING_DEPS[@]}"; do
+            case $dep in
+            "mods")
+                echo "- mods: https://github.com/charmbracelet/mods"
+                ;;
+            esac
+        done
+        exit 1
+    fi
+}
+
 # Function to determine if the current working directory is a git repository
 function is_git_repository() {
   git -C . rev-parse 2> /dev/null
@@ -131,6 +155,9 @@ autogit() {
 }
 
 run_autogit() {
+  # Ensure user has dependencies installed 
+  check_dependencies
+
   local current_dir
   current_dir=$(pwd)
   for subdir in $(find "$current_dir" -type d -name .git); do
