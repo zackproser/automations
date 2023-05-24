@@ -36,8 +36,6 @@ Here's an example of a code review you'd get back, right in your terminal, so th
 
 ![Example autoreview review output](./docs/autoreview-example.png)
 
-## Coming soon 
-
 ### `autocommitmessage`
 
 Never write "check in latest" ever again. Always get accurate, well-formed git messages that actually record the context of the changes you're making for posterity

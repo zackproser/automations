@@ -32,5 +32,49 @@ check_dependencies() {
     fi
 }
 
+# Function to determine if the current working directory is a git repository
+function is_git_repository() {
+  git -C . rev-parse 2> /dev/null
+}
 
+function get_default_branch() {
+  git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@'
+}
+
+function get_current_branch() {
+  git rev-parse --abbrev-ref HEAD
+}
+
+function get_commits_for_branch() {
+  git --no-pager log --pretty=format:"%s" --cherry "$(get_default_branch)"..."$(get_current_branch)"
+}
+
+function summarize_commit_messages() {
+  readonly commit_messages="$1"
+
+  local commit_summary
+  commit_summary="$(mods "Summarize these git commits into a pull request description. Include a high level summary of what the changes do, context for the changes, and anything else commonly appearing in high quality pull request descriptions" -f < "$commit_messages")"
+  echo "$commit_summary"
+
+}
+
+autopullrequest() {
+  if ! is_git_repository; then
+    echo "Not a git repository"
+    exit 1
+  fi
+
+  check_dependencies
+
+  commits=$(get_commits_for_branch)
+  if [ -z "$commits" ]; then
+    echo "No commits found"
+    exit 1
+  fi
+
+  summary=$(summarize_commit_messages "$commits")
+  echo "$summary"
+}
+
+autopullrequest
 
