@@ -45,3 +45,7 @@ Never write "check in latest" ever again. Always get accurate, well-formed git m
 Reads all the commit messages for commits that exist in your current branch but not in your default branch. Writes a pull request description and title for you, then uses the `gh` tool to programmatically open the pull request for you. Pairs very nicely with `autocommitmessage`.
 
 ![autopullrequest](./docs/autopullrequest.gif)
+
+Here's an example of a pull request opened by this automation - in fact, I ran it on this codebase itself to open my most recent pr!
+
+![autopr example pr screenshot](./docs/autopullrequest-example.png)
