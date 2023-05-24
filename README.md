@@ -5,10 +5,10 @@ Automations are shell scripts I wrote alongside generative AI, that leverage gen
 ![Shell automations for productivity and fun](./docs/automations.gif)
 
 ## Current automations
-* [`autogit`](https://github.com/zackproser/autogit)
-* [`autoreview`](https://github.com/zackproser/autoreview)
-* [`autocommitmessage`](https://github.com/zackproser/autocommitmessage)
-* [`autopullrequest`](https://github.com/zackproser/autopullrequest)
+* [`autogit`](#autogit)
+* [`autoreview`](#autoreview)
+* [`autocommitmessage`](#autocommitmessage)
+* [`autopullrequest`](#autopullrequest)
 
 ## Installation & usage
 
@@ -48,4 +48,4 @@ Reads all the commit messages for commits that exist in your current branch but 
 
 Here's an example of a pull request opened by this automation - in fact, I ran it on this codebase itself to open my most recent pr!
 
-![autopr example pr screenshot](./docs/autopullrequest-example.png)
+![autopullrequest example](./docs/autopullrequest-example.png)
