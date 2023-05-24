@@ -4,21 +4,17 @@ Automations are shell scripts I wrote alongside generative AI, that leverage gen
 
 ![Shell automations for productivity and fun](./docs/automations.gif)
 
-## Installation & Usage
+## Current automations
+* [`autogit`](https://github.com/zackproser/autogit)
+* [`autoreview`](https://github.com/zackproser/autoreview)
+* [`autocommitmessage`](https://github.com/zackproser/autocommitmessage)
+* [`autopullrequest`](https://github.com/zackproser/autopullrequest)
 
-### Prerequisites
-
-* [mods](https://github.com/charmbracelet/mods)
-* [glow](https://github.com/charmbracelet/glow) 
-* [gum](https://github.com/charmbracelet/gum) 
-
-### Usage
+## Installation & usage
 
 [Usage guide](./docs/usage.md)
 
-## Current automations
-
-### `autogit`
+## `autogit`
 
 autogit's goal is to ensure you're always working with the latest code, because even experienced developers forget to `git pull` at the least opportune times.
 
@@ -26,7 +22,7 @@ autogit's goal is to ensure you're always working with the latest code, because 
 
 [**Read the deep-dive blog post on `autogit`** to learn about everything it can do.](https://www.zackproser.com/blog/autogit-introduction)
 
-### `autoreview`
+## `autoreview`
 
 `autoreview` is a shell script that performs a detailed code review of your stashed git changes. 
 
@@ -36,15 +32,16 @@ Here's an example of a code review you'd get back, right in your terminal, so th
 
 ![Example autoreview review output](./docs/autoreview-example.png)
 
-### `autocommitmessage`
+## `autocommitmessage`
 
 Never write "check in latest" ever again. Always get accurate, well-formed git messages that actually record the context of the changes you're making for posterity
 
 ![auto git commit message writer](./docs/autocommitmessage.gif)
 
-## How it works 
+## `autopullrequest`
 
-Automations are shell scripts that wrap the excellent charm.sh libraries: 
+[Example pull request opened by this command.](https://github.com/zackproser/sizeof/pull/2)
 
-* [mods](https://github.com/charmbracelet/mods)
-* [glow](https://github.com/charmbracelet/glow)
+Reads all the commit messages for commits that exist in your current branch but not in your default branch. Writes a pull request description and title for you, then uses the `gh` tool to programmatically open the pull request for you. Pairs very nicely with `autocommitmessage`.
+
+![autopullrequest](./docs/autopullrequest.gif)
