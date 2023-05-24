@@ -38,7 +38,7 @@ function is_git_repository() {
 }
 
 function get_default_branch() {
-  git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@'
+  git remote show origin | awk '/HEAD branch/ {print $NF}'
 }
 
 function get_current_branch() {
@@ -46,14 +46,14 @@ function get_current_branch() {
 }
 
 function get_commits_for_branch() {
-  git --no-pager log --pretty=format:"%s" --cherry "$(get_default_branch)"..."$(get_current_branch)"
+    git --no-pager log --pretty=format:"%s" ..."$(get_default_branch)"
 }
 
 function summarize_commit_messages() {
   readonly commit_messages="$1"
 
   local commit_summary
-  commit_summary="$(mods "Summarize these git commits into a pull request description. Include a high level summary of what the changes do, context for the changes, and anything else commonly appearing in high quality pull request descriptions" -f < "$commit_messages")"
+  commit_summary="$(echo "$commit_messages" | mods "Summarize these git commits into a pull request description. Include a high level summary of what the changes do, context for the changes, and anything else commonly appearing in high quality pull request descriptions")"
   echo "$commit_summary"
 
 }
