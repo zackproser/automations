@@ -4,15 +4,7 @@ Automations are shell scripts I wrote alongside generative AI, that leverage gen
 
 ![Shell automations for productivity and fun](./docs/automations.gif)
 
-## Installation & Usage
-
-### Prerequisites
-
-* [mods](https://github.com/charmbracelet/mods)
-* [glow](https://github.com/charmbracelet/glow) 
-* [gum](https://github.com/charmbracelet/gum) 
-
-### Usage
+## Installation & usage
 
 [Usage guide](./docs/usage.md)
 
@@ -42,9 +34,8 @@ Never write "check in latest" ever again. Always get accurate, well-formed git m
 
 ![auto git commit message writer](./docs/autocommitmessage.gif)
 
-## How it works 
+### `autopullrequest`
 
-Automations are shell scripts that wrap the excellent charm.sh libraries: 
+[Example pull request opened by this command.](https://github.com/zackproser/sizeof/pull/1)
 
-* [mods](https://github.com/charmbracelet/mods)
-* [glow](https://github.com/charmbracelet/glow)
+Reads all the commit messages for commits that exist in your current branch but not in your default branch. Writes a pull request description and title for you, then uses the `gh` tool to programmatically open the pull request for you. Pairs very nicely with `autocommitmessage`.
