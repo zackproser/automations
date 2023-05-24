@@ -43,7 +43,7 @@ generate_review_file() {
 generate_review() {
     local review_filename="$1"
     printf "\n" >> "$review_filename"
-    echo "# Code Review for $REPO_NAME at `date -u +"%Y-%dt%H:%M"`" > "$review_filename"
+    echo "# Code Review for $REPO_NAME at `date -u +"%Y-%dt%H:%M"`" >> "$review_filename"
     printf "\n" >> "$review_filename"
     echo "## Here's what I found" >> "$review_filename"
     git diff --cached | mods "$REVIEW_PROMPT" >> "$review_filename"
