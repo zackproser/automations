@@ -55,8 +55,19 @@ function summarize_commit_messages() {
   local commit_summary
   commit_summary="$(echo "$commit_messages" | mods "Summarize these git commits into a pull request description. Include a high level summary of what the changes do, context for the changes, and anything else commonly appearing in high quality pull request descriptions")"
   echo "$commit_summary"
-
 }
+
+function create_title_from_summary() {
+  readonly commit_summary="$1"
+
+  pr_title="$(echo "$commit_summary" | mods "Write a pull request title based of this summary. Make sure it is concise yet perfectly descriptive of the changes")"
+  echo "$pr_title"
+}
+
+function ensure_changes_pushed() {
+  git push -u origin "$(get_current_branch)"
+}
+
 
 autopullrequest() {
   if ! is_git_repository; then
@@ -72,8 +83,14 @@ autopullrequest() {
     exit 1
   fi
 
+  ensure_changes_pushed
+
   summary=$(summarize_commit_messages "$commits")
-  echo "$summary"
+
+  title=$(create_title_from_summary "$summary")
+
+
+  gh pr create --title "$title" --body "$summary"  
 }
 
 autopullrequest
