@@ -53,14 +53,14 @@ function summarize_commit_messages() {
   readonly commit_messages="$1"
 
   local commit_summary
-  commit_summary="$(echo "$commit_messages" | mods "Summarize these git commits into a pull request description. Include a high level summary of what the changes do, context for the changes, and anything else commonly appearing in high quality pull request descriptions")"
+  commit_summary="$(echo "$commit_messages" | mods --status-text "Summarizing commits into PR description" "Summarize these git commits into a pull request description. Include a high level summary of what the changes do, context for the changes, and anything else commonly appearing in high quality pull request descriptions")"
   echo "$commit_summary"
 }
 
 function create_title_from_summary() {
   readonly commit_summary="$1"
 
-  pr_title="$(echo "$commit_summary" | mods --status-text "Opening pull request" "Write a pull request title based of this summary. Make sure it is concise yet perfectly descriptive of the changes")"
+  pr_title="$(echo "$commit_summary" | mods --status-text "Writing pull request title" "Write a pull request title based of this summary. Make sure it is concise yet perfectly descriptive of the changes")"
   echo "$pr_title"
 }
 
