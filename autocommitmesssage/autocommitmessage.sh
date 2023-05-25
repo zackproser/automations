@@ -27,7 +27,7 @@ check_dependencies() {
 }
 
 autocommitmessage() {
-  msg="$(git diff --cached | mods "write a commit message for this diff")" && \
+  msg="$(git diff --cached | mods --status-text "Writing commit message" "write a commit message for this diff")" && \
       printf '\n' && \
       gum write --header=" Look good? Ctrl+D to commit." --value="$msg" && \
       git commit -am "$msg"

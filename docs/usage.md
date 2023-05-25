@@ -5,7 +5,7 @@
 
 Please ensure you have the following installed. The scripts will ensure they are installed and error out with a helpful message about where to find them if they are not.
 
-* [mods](https://github.com/charmbracelet/mods)
+* [mods version v0.2.0 or later](https://github.com/charmbracelet/mods)
 * [glow](https://github.com/charmbracelet/glow) 
 * [gum](https://github.com/charmbracelet/gum) 
 

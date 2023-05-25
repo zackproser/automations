@@ -60,7 +60,7 @@ function summarize_commit_messages() {
 function create_title_from_summary() {
   readonly commit_summary="$1"
 
-  pr_title="$(echo "$commit_summary" | mods "Write a pull request title based of this summary. Make sure it is concise yet perfectly descriptive of the changes")"
+  pr_title="$(echo "$commit_summary" | mods --status-text "Opening pull request" "Write a pull request title based of this summary. Make sure it is concise yet perfectly descriptive of the changes")"
   echo "$pr_title"
 }
 

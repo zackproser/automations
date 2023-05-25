@@ -46,7 +46,7 @@ generate_review() {
     echo "# Code Review for $REPO_NAME at `date -u +"%Y-%dt%H:%M"`" >> "$review_filename"
     printf "\n" >> "$review_filename"
     echo "## Here's what I found" >> "$review_filename"
-    git diff --cached | mods "$REVIEW_PROMPT" >> "$review_filename"
+    git diff --cached | mods --status-text "Reviewing your code" "$REVIEW_PROMPT" >> "$review_filename"
 }
 
 # Check dependencies
